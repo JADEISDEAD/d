@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Echo Room</title>
+  <style>
+    body {
+      background-color: #000;
+      color: white;
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #container {
+      max-width: 800px;
+      text-align: center;
+    }
+    #inputArea, #chatArea {
+      margin-top: 2rem;
+    }
+    .fade {
+      opacity: 0;
+      transition: opacity 2s;
+    }
+    .glitch {
+      animation: glitch 0.3s infinite;
+    }
+    @keyframes glitch {
+      0% { text-shadow: 2px 2px red; }
+      50% { text-shadow: -2px -2px blue; }
+      100% { text-shadow: 2px -2px lime; }
+    }
+    .whisper {
+      font-size: 0.8rem;
+      color: #888;
+      font-style: italic;
+      opacity: 0.6;
+    }
+    .flicker {
+      animation: flicker 0.15s infinite alternate;
+    }
+    @keyframes flicker {
+      from { opacity: 1; }
+      to { opacity: 0.8; }
+    }
+    audio { display: none; }
+	    .custom-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        .custom-button img {
+            width: 40px;
+            height: 40px;
+        }
+        .custom-button img:hover {
+            opacity: 0.8;
+        }
+  </style>
+</head>
+<body class="flicker">
+ <a href="http://jadeisdead.com/" target="_blank" class="custom-button">
+        <img src="https://media.tenor.com/yso9Ncqwm5UAAAAi/click-subscribe.gif" alt="Custom Button">
+    </a>
+
+  <div id="container">
+    <div id="display"></div>
+    <div id="inputArea">
+      <input type="text" id="nameInput" placeholder="What is your name?" />
+      <button onclick="startSimulation()">Enter</button>
+    </div>
+    <div id="chatArea"></div>
+  </div>
+
+  <audio id="whispers" loop>
+    <source src="https://raw.githubusercontent.com/JADEISDEAD/i-just-needed-the-photo/refs/heads/main/whispers.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    let userName = '';
+    let display = document.getElementById('display');
+    let inputArea = document.getElementById('inputArea');
+    let chatArea = document.getElementById('chatArea');
+    let corruptionLevel = 0;
+    let audio = document.getElementById('whispers');
+
+    let messages = [
+      "You were just here.",
+      "We talked about this.",
+      "You said something important.",
+      "What did you forget?",
+      "I was here yesterday.",
+      "Your name... it changed.",
+      "Why did you leave me?",
+      "It’s getting darker."
+    ];
+
+    function startSimulation() {
+      userName = document.getElementById('nameInput').value || "You";
+      inputArea.remove();
+      display.innerText = `Welcome back, ${userName}. You were just here.`;
+      audio.volume = 0.3;
+      audio.play().catch(() => console.warn("Autoplay blocked"));
+      setTimeout(() => nextPhase(), 3000);
+    }
+
+    function nextPhase() {
+      setInterval(() => {
+        corruptName();
+        addMessage();
+        increaseCorruption();
+      }, 4000);
+    }
+
+    function corruptName() {
+      let nameArr = userName.split('');
+      for (let i = 0; i < corruptionLevel; i++) {
+        const index = Math.floor(Math.random() * nameArr.length);
+        nameArr[index] = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+      }
+      let corruptedName = nameArr.join('');
+      display.innerText = `Welcome back, ${corruptedName}. You were just here.`;
+    }
+
+    function addMessage() {
+      let msg = document.createElement('div');
+      let isWhisper = Math.random() < 0.3;
+      let randomMsg = messages[Math.floor(Math.random() * messages.length)];
+
+      if (Math.random() < 0.3) randomMsg = generateFakeMemory();
+
+      msg.innerText = randomMsg;
+      msg.classList.add('glitch');
+      if (isWhisper) msg.classList.add('whisper');
+
+      chatArea.appendChild(msg);
+
+      setTimeout(() => {
+        msg.classList.add('fade');
+      }, 3000);
+    }
+
+    function generateFakeMemory() {
+      const strangeMemories = [
+        `You loved the ocean made of glass.`,
+        `You said purple snow tasted like laughter.`,
+        `Remember the time you floated?`,
+        `Your birthday is on a Wednesday.`,
+        `You never liked shadows.`,
+        `You screamed when the walls moved.`,
+        `There was something behind the mirror.`,
+        `They told you not to come back.`,
+        `You buried it under the floor.`
+      ];
+      return strangeMemories[Math.floor(Math.random() * strangeMemories.length)];
+    }
+
+    function increaseCorruption() {
+      corruptionLevel++;
+      if (corruptionLevel > 10) {
+        display.innerText = "It’s okay. You don’t need to remember anymore.";
+        document.body.style.backgroundColor = "#111";
+      }
+    }
+  </script>
+</body>
+</html>
